@@ -190,7 +190,8 @@ function handleAddExpense(event) {
 
     if (!isNaN(amount)) {
         let expenses = getExpensesFromLocalStorage();
-        expenses.push({ title, amount });
+        let timestamp = Date.now(); // Menambahkan timestamp
+        expenses.push({ title, amount, timestamp });
         localStorage.setItem('expenses', JSON.stringify(expenses));
 
         // Menggunakan SweetAlert2 untuk alert
@@ -211,6 +212,7 @@ function handleAddExpense(event) {
         });
     }
 }
+
 
 /**
  * Fungsi untuk memperbarui total pengeluaran berdasarkan data dari localStorage.
@@ -253,11 +255,13 @@ function renderExpensesPage() {
      <div class="sort-container">
          <label for="sort">Urutkan: </label>
          <select id="sort" onchange="sortExpenses()">
-             <option value="latest">Terbaru</option>
-             <option value="amount">Jumlah</option>
-             <option value="az">A-Z</option>
-             <option value="za">Z-A</option>
-         </select>
+          <option value="">pilih</option>
+        <option value="highest">Tertinggi</option>
+        <option value="lowest">Terendah</option>
+        <option value="az">A-Z</option>
+        <option value="za">Z-A</option>
+    </select>
+
      </div>
  </div>
  <div class="expenses-list" id="expenses-list">
@@ -296,32 +300,32 @@ function sortExpenses() {
     const sortValue = document.getElementById('sort').value;
     let expenses = getExpensesFromLocalStorage();
 
-    if (sortValue === 'latest') {
-        expenses.sort((a, b) => b.index - a.index);
-    } else if (sortValue === 'amount') {
-        expenses.sort((a, b) => b.amount - a.amount);
+    if (sortValue === 'highest') {
+        expenses.sort((a, b) => b.amount - a.amount); // Mengurutkan berdasarkan jumlah tertinggi
+    } else if (sortValue === 'lowest') {
+        expenses.sort((a, b) => a.amount - b.amount); // Mengurutkan berdasarkan jumlah terendah
     } else if (sortValue === 'az') {
-        expenses.sort((a, b) => a.title.localeCompare(b.title));
+        expenses.sort((a, b) => a.title.localeCompare(b.title)); // Mengurutkan secara alfabet (A-Z)
     } else if (sortValue === 'za') {
-        expenses.sort((a, b) => b.title.localeCompare(a.title));
+        expenses.sort((a, b) => b.title.localeCompare(a.title)); // Mengurutkan secara alfabet (Z-A)
     }
 
     renderFilteredExpenses(expenses);
 }
+
 
 /**
  * Fungsi untuk mengedit pengeluaran berdasarkan indeks yang diberikan.
  * @param {number} index - Indeks pengeluaran yang akan diedit.
  * */
 function editExpense(index) {
-    // Ambil semua pengeluaran dari localStorage
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-
-    // Ambil pengeluaran yang sesuai berdasarkan indeks yang diberikan
     let filteredExpenses = getFilteredExpenses();
     let expense = filteredExpenses[index];
 
-    // Temukan indeks pengeluaran yang dipilih di daftar lengkap
+    // Mengambil daftar pengeluaran dari localStorage
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+    // Temukan indeks pengeluaran yang dipilih di daftar lengkap (expenses)
     let originalIndex = expenses.findIndex(exp => exp.title === expense.title && exp.amount === expense.amount);
 
     // Menggunakan SweetAlert2 untuk prompt judul baru
@@ -335,8 +339,8 @@ function editExpense(index) {
     }).then((result) => {
         if (result.isConfirmed) {
             const newTitle = result.value;
-            if (newTitle !== null) { // Jika pengguna memasukkan nilai baru (bukan cancel)
-                expense.title = newTitle;
+            if (newTitle !== null) {
+                expense.title = newTitle; // Update judul expense sesuai input pengguna
             }
 
             // Menggunakan SweetAlert2 untuk prompt jumlah baru
@@ -350,8 +354,8 @@ function editExpense(index) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     const newAmount = result.value;
-                    if (newAmount !== null) { // Jika pengguna memasukkan nilai baru (bukan cancel)
-                        expense.amount = parseFloat(newAmount);
+                    if (newAmount !== null) {
+                        expense.amount = parseFloat(newAmount); // Update jumlah expense sesuai input pengguna
                         if (isNaN(expense.amount)) {
                             Swal.fire({
                                 title: 'Error',
@@ -362,12 +366,12 @@ function editExpense(index) {
                             return;
                         }
 
-                        // Update data pengeluaran yang tersimpan di localStorage berdasarkan indeks asli
+                        // Update data pengeluaran yang tersimpan di localStorage berdasarkan indeks asli (originalIndex)
                         expenses[originalIndex] = expense;
                         localStorage.setItem('expenses', JSON.stringify(expenses));
 
                         // Render ulang daftar pengeluaran dengan data yang diperbarui
-                        renderFilteredExpenses();
+                        renderExpensesPage();
 
                         // Update total pengeluaran dan pengeluaran tertinggi setelah mengedit
                         updateTotalExpenses();
@@ -379,33 +383,31 @@ function editExpense(index) {
     });
 }
 
-/**
- * Memperbarui tampilan daftar pengeluaran berdasarkan hasil filter dan pengurutan.
- * Mengambil nilai pencarian dari input dengan ID 'search' dan nilai pengurutan dari dropdown dengan ID 'sort'.
- * Jika terdapat pengeluaran yang sesuai dengan kriteria pencarian, mereka akan dirender dalam elemen dengan ID 'expenses-list'.
- * Setiap pengeluaran akan ditampilkan dalam bentuk elemen HTML dengan tombol untuk mengedit dan menghapus.
- * Jika tidak ada pengeluaran yang sesuai, akan menampilkan pesan bahwa tidak ada pengeluaran tersimpan.
- * */
-function renderFilteredExpenses() {
-    const filteredExpenses = getFilteredExpenses(); // Mendapatkan daftar pengeluaran yang sudah difilter
-    const expensesList = document.getElementById('expenses-list'); // Mendapatkan elemen 'expenses-list'
 
-    // Mengubah innerHTML dari 'expenses-list' berdasarkan hasil filter
-    expensesList.innerHTML = filteredExpenses.length > 0 ?
-        // Jika ada pengeluaran yang sesuai, membangun string HTML untuk setiap pengeluaran
-        filteredExpenses.map((expense, index) => `
-     <div class="expense-item" data-index="${index}">
-         <h3>${expense.title}</h3>
-         <p>${expense.amount.toFixed(2)} IDR</p>
-         <div class="btn-item">
-             <button class="edit" onclick="editExpense(${index})">Edit</button>
-             <button class="delete" onclick="deleteExpense(${index})">Delete</button>
-         </div>
-     </div>
- `).join('') :
-        // Jika tidak ada pengeluaran yang sesuai, menampilkan pesan bahwa tidak ada pengeluaran tersimpan
+/**
+ * Fungsi untuk memperbarui tampilan daftar pengeluaran berdasarkan hasil filter dan pengurutan.
+ * @param {Array} expenses - Daftar pengeluaran yang sudah difilter dan diurutkan.
+ */
+function renderFilteredExpenses(expenses) {
+    const expensesList = document.getElementById('expenses-list');
+    expensesList.innerHTML = expenses.length > 0 ?
+        expenses.map((expense, index) => `
+            <div class="expense-item" data-index="${index}">
+                <h3>${expense.title}</h3>
+                <p>${expense.amount.toFixed(2)} IDR</p>
+                <div class="btn-item">
+                     <button class="edit" onclick="editExpense(${index})">
+                      <i class="fas fa-edit"></i>
+                      </button>
+                 <button class="delete" onclick="deleteExpense(${index})">
+                      <i class="fas fa-trash-alt"></i>
+                      </button>
+                </div>
+            </div>
+        `).join('') :
         '<p>Tidak ada pengeluaran tersimpan.</p>';
 }
+
 
 /**
  * Mengambil daftar pengeluaran dari localStorage dan melakukan filter dan pengurutan berdasarkan nilai pencarian dan pengurutan yang diberikan.
@@ -425,7 +427,7 @@ function getFilteredExpenses() {
 
     // Lakukan sorting berdasarkan nilai sortValue
     if (sortValue === 'latest') {
-        expenses.sort((a, b) => b.index - a.index); // Mengurutkan berdasarkan index (terbaru)
+        expenses.sort((a, b) => b.timestamp - a.timestamp); // Mengurutkan berdasarkan index (terbaru)
     } else if (sortValue === 'amount') {
         expenses.sort((a, b) => b.amount - a.amount); // Mengurutkan berdasarkan jumlah (terbesar)
     } else if (sortValue === 'az') {
@@ -471,5 +473,17 @@ function deleteExpense(index) {
     });
 }
 
-renderNavLinks();
-navigateTo('login');
+/**
+ * Fungsi untuk menginisialisasi aplikasi dengan memeriksa status login dan merender link navigasi yang sesuai.
+ * */
+function init() {
+    const registeredUser = localStorage.getItem('registeredUser');
+    if (registeredUser) {
+        isLoggedIn = true;
+    }
+    renderNavLinks();
+    navigateTo('dashboard');
+}
+
+// Inisialisasi aplikasi
+init();
