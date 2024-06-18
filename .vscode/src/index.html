@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Expense Tracker</h1>
+    </header>
+
+    <!-- Sidebar navigasi -->
+    <div id="sidebar">
+        <nav id="nav-links">
+            <!-- Navigasi tergantung status login -->
+            <a href="#" onclick="navigateTo('register')">Register</a>
+            <a href="#" onclick="navigateTo('login')">Login</a>
+            <a href="#" onclick="navigateTo('expenses')">Pengeluaran</a>
+        </nav>
+    </div>
+
+    <!-- Konten utama aplikasi -->
+    <div class="content">
+        <div class="container" id="main-content"></div>
+        <!-- Konten utama yang akan diubah sesuai navigasi -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="main.js"></script>
+</body>
+</html>

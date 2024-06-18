@@ -1,0 +1,10 @@
+{
+  "name": "nama-proyek",
+  "version": "1.0.0",
+  "scripts": {
+    "docs": "jsdoc -c ./jsdoc.conf.json"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.3"
+  }
+}
