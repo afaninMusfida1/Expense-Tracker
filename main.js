@@ -128,13 +128,13 @@ function navigateTo(page) {
  * @param {Event} event - Objek event dari form submission.
  */
 function handleLogin(event) {
-    event.preventDefault();
+    event.preventDefault(); // memastikan bahwa setelah form login disubmit, JavaScript dapat memproses informasi yang diperlukan (seperti memeriksa email dan password)
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     const errorMessage = document.getElementById('error-message');
 
     // Mendapatkan informasi pengguna terdaftar dari localStorage
-    const registeredUser = JSON.parse(localStorage.getItem('registeredUser'));
+    const registeredUser = JSON.parse(localStorage.getItem('registeredUser')); //JSONParse => string menjadi objek
 
     // Memeriksa keberadaan pengguna terdaftar 
     if (registeredUser && email === registeredUser.email && password === registeredUser.password) {
@@ -151,13 +151,13 @@ function handleLogin(event) {
  * @param {Event} event - Objek event dari form submission.
  */
 function handleRegister(event) {
-    event.preventDefault();
+    event.preventDefault(); // memastikan bahwa setelah form login disubmit, JavaScript dapat memproses informasi yang diperlukan (seperti memeriksa email dan password)
     const name = document.getElementById('register-name').value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
 
     // registrasi dengan menyimpan data di localStorage
-    localStorage.setItem('registeredUser', JSON.stringify({ name, email, password }));
+    localStorage.setItem('registeredUser', JSON.stringify({ name, email, password })); //mengubah objek JavaScript menjadi string JSON
     //alert('Registrasi berhasil! Silakan login.');
     //navigateTo('login');
     Swal.fire({
@@ -184,7 +184,7 @@ function logout() {
  * @param {Event} event - Objek event dari form submission.
  */
 function handleAddExpense(event) {
-    event.preventDefault();
+    event.preventDefault(); // memastikan bahwa setelah form login disubmit, JavaScript dapat memproses informasi yang diperlukan (seperti memeriksa email dan password)
     const title = document.getElementById('expense-title').value;
     const amount = parseFloat(document.getElementById('expense-amount').value);
 
@@ -192,7 +192,7 @@ function handleAddExpense(event) {
         let expenses = getExpensesFromLocalStorage();
         let timestamp = Date.now(); // Menambahkan timestamp
         expenses.push({ title, amount, timestamp });
-        localStorage.setItem('expenses', JSON.stringify(expenses));
+        localStorage.setItem('expenses', JSON.stringify(expenses)); //mengubah objek JavaScript menjadi string JSON
 
         // Menggunakan SweetAlert2 untuk alert
         Swal.fire({
@@ -218,7 +218,7 @@ function handleAddExpense(event) {
  * Fungsi untuk memperbarui total pengeluaran berdasarkan data dari localStorage.
  * */
 function updateTotalExpenses() {
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || []; //mengambil data expense di LS, format string JSON menjadi JS, jika tidak ada data yang tersimpan maka exxpense=array kosong
     let total = expenses.reduce((acc, expense) => acc + parseFloat(expense.amount), 0);
     document.getElementById('total-expenses').textContent = `${total.toFixed(2)} IDR`;
 }
@@ -237,7 +237,7 @@ function updateHighestExpense() {
  * @returns {Array} - Daftar pengeluaran yang tersimpan.
  * */
 function getExpensesFromLocalStorage() {
-    return JSON.parse(localStorage.getItem('expenses')) || [];
+    return JSON.parse(localStorage.getItem('expenses')) || []; //JSON => JS
 }
 
 /**
@@ -287,8 +287,8 @@ function renderExpensesPage() {
  * Fungsi untuk melakukan filter daftar pengeluaran berdasarkan pencarian.
  * */
 function filterExpenses() {
-    const searchValue = document.getElementById('search').value.toLowerCase();
-    const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    const searchValue = document.getElementById('search').value.toLowerCase(); //menjadi huruf kecil
+    const expenses = JSON.parse(localStorage.getItem('expenses')) || []; //JSON => JS
     const filteredExpenses = expenses.filter(expense => expense.title.toLowerCase().includes(searchValue));
     renderFilteredExpenses(filteredExpenses);
 }
