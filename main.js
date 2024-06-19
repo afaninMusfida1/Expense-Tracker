@@ -482,7 +482,7 @@ function init() {
         isLoggedIn = true;
     }
     renderNavLinks();
-    navigateTo('dashboard');
+    navigateTo('login');
 }
 
 // Inisialisasi aplikasi
