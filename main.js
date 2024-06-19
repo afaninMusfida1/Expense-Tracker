@@ -326,7 +326,7 @@ function editExpense(index) {
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
 
     // Temukan indeks pengeluaran yang dipilih di daftar lengkap (expenses)
-    let originalIndex = expenses.findIndex(exp => exp.title === expense.title && exp.amount === expense.amount);
+    let originalIndex = expenses.findIndex(exp => exp.title === expense.title && exp.amount === expense.amount && exp.timestamp === expense.timestamp);
 
     // Menggunakan SweetAlert2 untuk prompt judul baru
     Swal.fire({
@@ -480,9 +480,11 @@ function init() {
     const registeredUser = localStorage.getItem('registeredUser');
     if (registeredUser) {
         isLoggedIn = false;
+        navigateTo('login');
+    } else if (registeredUser) {
+        isLoggedIn = true;
+        navigateTo('dashboard');
     }
-    renderNavLinks();
-    navigateTo('login');
 }
 
 // Inisialisasi aplikasi
