@@ -479,7 +479,7 @@ function deleteExpense(index) {
 function init() {
     const registeredUser = localStorage.getItem('registeredUser');
     if (registeredUser) {
-        isLoggedIn = true;
+        isLoggedIn = false;
     }
     renderNavLinks();
     navigateTo('login');
